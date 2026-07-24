@@ -4,3 +4,5 @@
 *.vcd
 *.vvp
 .DS_Store
+ALU/alu_sim
+papers/
