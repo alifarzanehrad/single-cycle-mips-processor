@@ -1,0 +1,124 @@
+$date
+	Thu Jul 23 13:54:16 2026
+$end
+$version
+	Icarus Verilog
+$end
+$timescale
+	1ps
+$end
+$scope module tb_ALU $end
+$var wire 1 ! zero $end
+$var wire 1 " sign $end
+$var wire 1 # overflow $end
+$var wire 32 $ out [31:0] $end
+$var reg 3 % func [2:0] $end
+$var reg 32 & in1 [31:0] $end
+$var reg 32 ' in2 [31:0] $end
+$var reg 5 ( shamt [4:0] $end
+$scope module uut $end
+$var wire 3 ) func [2:0] $end
+$var wire 32 * in1 [31:0] $end
+$var wire 32 + in2 [31:0] $end
+$var wire 5 , shamt [4:0] $end
+$var reg 32 - out [31:0] $end
+$var reg 1 # overflow $end
+$var reg 1 " sign $end
+$var reg 1 ! zero $end
+$upscope $end
+$upscope $end
+$enddefinitions $end
+$comment Show the parameter values. $end
+$dumpall
+$end
+#0
+$dumpvars
+b11110 -
+b0 ,
+b10100 +
+b1010 *
+b0 )
+b0 (
+b10100 '
+b1010 &
+b0 %
+b11110 $
+0#
+0"
+0!
+$end
+#10000
+b110010 &
+b110010 *
+b1 %
+b1 )
+#20000
+b100 $
+b100 -
+b10 (
+b10 ,
+b10000 &
+b10000 *
+b10 %
+b10 )
+#30000
+b11000 $
+b11000 -
+b11 (
+b11 ,
+b11 &
+b11 *
+b11 %
+b11 )
+#40000
+1"
+b11111111000000001111111111111111 $
+b11111111000000001111111111111111 -
+b111111110000000011111111 '
+b111111110000000011111111 +
+b11111111111111110000000000000000 &
+b11111111111111110000000000000000 *
+b100 %
+b100 )
+#50000
+0"
+b1 $
+b1 -
+b101000 '
+b101000 +
+b1111 &
+b1111 *
+b101 %
+b101 )
+#60000
+b101101 $
+b101101 -
+b101101 '
+b101101 +
+b1100100 &
+b1100100 *
+b110 %
+b110 )
+#70000
+1!
+b0 $
+b0 -
+b11001 '
+b11001 +
+b11001 &
+b11001 *
+b1 %
+b1 )
+#80000
+1"
+0!
+1#
+b10000000000000000000000000000000 $
+b10000000000000000000000000000000 -
+b1 '
+b1 +
+b1111111111111111111111111111111 &
+b1111111111111111111111111111111 *
+b0 %
+b0 )
+#90000
