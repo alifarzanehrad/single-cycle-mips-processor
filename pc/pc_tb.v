@@ -26,11 +26,7 @@ module pc_calculator_tb;
     reg [31:0] expected_pc;
     reg [31:0] pc_prev;
 
-    initial begin
-        $display("\n========================================");
-        $display("      PC CALCULATOR TESTBENCH");
-        $display("========================================\n");
-        
+    initial begin        
         clk = 0;
         reset = 1;
         jump = 0;
@@ -45,9 +41,9 @@ module pc_calculator_tb;
         #10;
         $display("  Reset=0 -> PC = 0x%08h (expected 0x00000000)", pc);
         if (pc === 32'h00000000)
-            $display("  ✅ PASSED\n");
+            $display("PASSED\n");
         else
-            $display("  ❌ FAILED\n");
+            $display("FAILED\n");
         
         reset = 1;
         @(posedge clk);
@@ -68,9 +64,9 @@ module pc_calculator_tb;
             $display("  Cycle %d: PC = 0x%08h (expected 0x%08h)", 
                      i+1, pc, expected_pc);
             if (pc === expected_pc)
-                $display("    ✅ PASSED");
+                $display("PASSED");
             else
-                $display("    ❌ FAILED");
+                $display("FAILED");
             pc_prev = pc;
         end
         $display("");
@@ -87,9 +83,9 @@ module pc_calculator_tb;
         $display("  BranchOffset=0x%04h (+%d)", branch_offset, $signed(branch_offset));
         $display("  PC = 0x%08h (expected 0x%08h)", pc, expected_pc);
         if (pc === expected_pc)
-            $display("  ✅ PASSED\n");
+            $display("PASSED\n");
         else
-            $display("  ❌ FAILED\n");
+            $display("FAILED\n");
         pc_prev = pc;
         
         $display("TEST 4: Branch Backward (Jump=0, Branch=1)");
@@ -102,9 +98,9 @@ module pc_calculator_tb;
         $display("  BranchOffset=0x%04h (%d)", branch_offset, $signed(branch_offset));
         $display("  PC = 0x%08h (expected 0x%08h)", pc, expected_pc);
         if (pc === expected_pc)
-            $display("  ✅ PASSED\n");
+            $display("PASSED\n");
         else
-            $display("  ❌ FAILED\n");
+            $display("FAILED\n");
         pc_prev = pc;
         
         $display("TEST 5: Jump (Jump=1, Branch=0)");
@@ -119,9 +115,9 @@ module pc_calculator_tb;
         $display("  JumpAddress=0x%06h", jump_address);
         $display("  PC = 0x%08h (expected 0x%08h)", pc, expected_pc);
         if (pc === expected_pc)
-            $display("  ✅ PASSED\n");
+            $display("PASSED\n");
         else
-            $display("  ❌ FAILED\n");
+            $display("FAILED\n");
         pc_prev = pc;
         
         $display("TEST 6: Jump with different address");
@@ -134,9 +130,9 @@ module pc_calculator_tb;
         $display("  JumpAddress=0x%06h", jump_address);
         $display("  PC = 0x%08h (expected 0x%08h)", pc, expected_pc);
         if (pc === expected_pc)
-            $display("  ✅ PASSED\n");
+            $display("PASSED\n");
         else
-            $display("  ❌ FAILED\n");
+            $display("FAILED\n");
         pc_prev = pc;
         
         $display("TEST 7: Invalid State (Jump=1, Branch=1)");
@@ -147,9 +143,9 @@ module pc_calculator_tb;
         #1;
         $display("  Jump=1, Branch=1 -> PC = 0x%08h (expected xxxxxxxx)", pc);
         if (pc === 32'hxxxxxxxx)
-            $display("  ✅ PASSED (Output is X)\n");
+            $display("PASSED (Output is X)\n");
         else
-            $display("  ❌ FAILED\n");
+            $display("FAILED\n");
         
         $display("TEST 8: Exit Invalid State -> Normal");
         $display("----------------------------------------");
@@ -158,7 +154,7 @@ module pc_calculator_tb;
         @(posedge clk);
         #1;
         $display("  Jump=0, Branch=0 -> PC = 0x%08h", pc);
-        $display("  ✅ PASSED\n");
+        $display("PASSED\n");
         pc_prev = pc;
         
         $display("TEST 9: Reset Again");
@@ -167,9 +163,9 @@ module pc_calculator_tb;
         #10;
         $display("  Reset=0 -> PC = 0x%08h (expected 0x00000000)", pc);
         if (pc === 32'h00000000)
-            $display("  ✅ PASSED\n");
+            $display("PASSED\n");
         else
-            $display("  ❌ FAILED\n");
+            $display("FAILED\n");
         
         reset = 1;
         @(posedge clk);
@@ -189,13 +185,9 @@ module pc_calculator_tb;
         $display("  BranchOffset=0x%04h (+%d)", branch_offset, $signed(branch_offset));
         $display("  PC = 0x%08h (expected 0x%08h)", pc, expected_pc);
         if (pc === expected_pc)
-            $display("  ✅ PASSED\n");
+            $display("PASSED\n");
         else
-            $display("  ❌ FAILED\n");
-        
-        $display("========================================");
-        $display("      ALL TESTS COMPLETED!");
-        $display("========================================");
+            $display("FAILED\n");
         
         #50;
         $finish;

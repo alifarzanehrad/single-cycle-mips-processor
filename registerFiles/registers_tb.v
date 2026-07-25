@@ -27,7 +27,6 @@ module registers_tb;
     always #5 clk = ~clk;
 
     initial begin
-        $display("\n========== REGISTER FILE TEST ==========\n");
         
         clk = 0;
         clr = 0;
@@ -37,7 +36,6 @@ module registers_tb;
         writeReg = 0;
         writeData = 0;
 
-        // تست 1: ریست
         $display("1. Reset");
         clr = 1;
         #10;
@@ -119,7 +117,6 @@ module registers_tb;
                 $display("   reg[%2d] = %h ✗ (should be %h)", i, readData1, i);
         end
 
-        $display("\n========== TEST COMPLETED ==========\n");
         #50;
         $finish;
     end

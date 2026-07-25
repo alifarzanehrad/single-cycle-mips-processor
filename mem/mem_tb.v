@@ -24,10 +24,6 @@ module mem_tb;
         address = 0;
         write_data = 0;
         
-        $display("==========================================");
-        $display("Data Memory Test");
-        $display("==========================================");
-        
         #10;
         address = 0;
         #10;
@@ -115,10 +111,6 @@ module mem_tb;
         #10;
         $display("Read[145] = %h (Expected: 99AABBCC) %s", read_data, 
                  (read_data === 32'h99AABBCC) ? "PASS" : "FAIL");
-        
-        $display("==========================================");
-        $display("All tests completed!");
-        
         #20;
         $finish;
     end
