@@ -12,10 +12,11 @@ module data_mem (
 
     initial begin
         for (i = 0; i < 256; i = i + 1)
-            mem[i] = 32'h00000000;
-        mem[0] = 32'h12345678;
-        mem[1] = 32'hAABBCCDD;
-        mem[2] = 32'hDEADBEEF;
+  mem[0] = 32'd0;   // F0
+        mem[1] = 32'd1;   // F1
+        mem[2] = 32'd1;   // ONE (step)
+        mem[3] = 32'd18;  // LIMIT: remaining terms to generate (20 total - 2 preloaded)
+        mem[4] = 32'd10;  // base storage address (word index)
     end
 
     always @(*) begin
