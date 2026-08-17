@@ -1,77 +1,118 @@
 # Single-Cycle MIPS Processor
 
-A single-cycle implementation of a MIPS-like processor, written in Verilog
-and verified with Icarus Verilog (iverilog).
+[![Verify RTL](https://github.com/alifarzanehrad/single-cycle-mips-processor/actions/workflows/verify.yml/badge.svg)](https://github.com/alifarzanehrad/single-cycle-mips-processor/actions/workflows/verify.yml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-## Overview
-
-This project implements the classic single-cycle MIPS datapath: instruction
-fetch, register file, ALU, data memory, and control logic, all completing
-in one clock cycle per instruction.
+A modular single-cycle MIPS-like processor written in Verilog and verified with
+Icarus Verilog. The repository contains the datapath, control logic, reusable
+program images, module-level tests, and end-to-end processor tests.
 
 ![Datapath Diagram](docs/datapath_diagram.png)
 
-## Supported Instructions
+## Architecture
 
-| Instruction | Opcode   | Type | Description        |
-|-------------|----------|------|---------------------|
-| add, sub    | 000000   | R    | Arithmetic          |
-| and, or, xor| 000000   | R    | Logical             |
-| sll, srl    | 000000   | R    | Shift               |
-| slt         | 000000   | R    | Set less than       |
-| lw          | 100011   | I    | Load word           |
-| sw          | 101011   | I    | Store word          |
-| beq         | 000100   | I    | Branch if equal     |
-| j           | 000010   | J    | Jump                |
+The core follows the classic single-cycle organization: instruction fetch,
+decode and control, two-read/one-write register file, ALU, data memory, and
+next-PC logic. Every instruction completes in one clock cycle. Branch targets
+are calculated relative to `PC+4`, and jump targets use the upper bits of
+`PC+4`.
 
-## Project Structure
+The design is divided into small synthesizable modules so that the ALU, decoder,
+memories, register file, and PC logic can be tested independently before the
+complete processor is exercised.
 
-- `src/` — RTL source files
-- `testbench/` — per-module and top-level testbenches
-- `programs/` — example programs written directly as machine code in the
-  instruction memory (e.g. a Fibonacci sequence generator)
-- `docs/` — diagrams and notes
+## Supported instructions
 
-## How to Run
+| Class | Instructions |
+|---|---|
+| Arithmetic | `add`, `addu`, `sub`, `subu`, `addi`, `addiu` |
+| Logical | `and`, `or`, `xor`, `nor`, `andi`, `ori`, `xori` |
+| Shift | `sll`, `srl`, `sra` |
+| Compare | `slt`, `sltu`, `slti` |
+| Memory | `lw`, `sw` |
+| Control flow | `beq`, `bne`, `j` |
+| Immediate construction | `lui` |
 
-Requires [Icarus Verilog](http://iverilog.icarus.com/).
+Signed and unsigned comparisons are implemented separately. Logical immediate
+instructions use zero extension; arithmetic and branch immediates use sign
+extension.
+
+## Project structure
+
+- `src/` — synthesizable processor RTL
+- `testbench/` — module and integration testbenches
+- `programs/` — machine-code programs loaded with `$readmemh`
+- `docs/` — datapath diagram and project notes
+
+The included Fibonacci program uses `addi` for constants, counters, and pointer
+updates, and stores the first 20 terms at data-memory word addresses 10 through
+29.
+
+## Run tests
+
+### Requirements
+
+- GNU Make
+- Icarus Verilog with SystemVerilog 2012 support
+
+On macOS:
 
 ```bash
-iverilog -o top_tb.vvp testbench/top_tb.v src/top.v src/alu.v \
-  src/alu_control.v src/control.v src/instr_mem.v src/data_mem.v \
-  src/mux.v src/pc.v src/registers.v
-vvp top_tb.vvp
+brew install icarus-verilog
 ```
 
-Each module also has its own standalone testbench under `testbench/`,
-runnable the same way with just that module's source file.
+Run the complete verification suite:
 
-## Testing
+```bash
+make test
+```
 
-Every module is verified independently before integration:
+The test suite covers ALU operations (including signed shifts and comparisons),
+instruction decoding, memories, register file, PC behavior, immediate
+extension, branches, and an end-to-end instruction program. `fib_tb` verifies
+the first 20 Fibonacci values.
 
-- ALU: arithmetic, logic, shift, overflow, zero flag
-- ALU control: opcode/funct to ALU operation mapping
-- Control unit: control signal generation for every supported opcode
-- Register file: read/write, clear, simultaneous dual-port read
-- Data memory / instruction memory: read/write, out-of-range handling
-- PC: reset, sequential increment, branch target, jump target
+The same command runs automatically in GitHub Actions on every push and pull
+request. A successful run requires every testbench to finish with zero errors.
 
-The top-level testbench runs a small program (load, add, store, load-back,
-branch) and checks ALU results and memory reads against expected values
-at each cycle.
+## Running a program
 
-## Known Limitations
+Programs are stored as one 32-bit hexadecimal instruction per line under
+`programs/`. Select a program when instantiating the processor:
 
-- Single-cycle only — no pipelining, no hazard forwarding
-- No immediate-arithmetic instructions (addi, andi, etc.)
-- Instruction and data memories are small, fixed-size arrays sized for
-  test programs, not a full address space
+```verilog
+top #(.PROGRAM_FILE("programs/fibonacci.hex")) dut (...);
+```
+
+`programs/instruction_test.hex` exercises arithmetic, logical immediate,
+comparison, shift, memory, and branch instructions. `programs/fibonacci.hex`
+generates and stores the first 20 Fibonacci numbers.
+
+## Memory model
+
+Instruction memory is byte-addressed through the PC and stores 32-bit words.
+Data memory is intentionally **word-addressed** in this educational core, so
+`lw $t0, 1($zero)` selects data-memory word 1 rather than byte address 1. This is
+the main deliberate difference from standard MIPS memory addressing.
+
+## Current scope
+
+- One instruction completes per clock cycle.
+- No pipeline, forwarding, stalls, exceptions, interrupts, or HI/LO unit.
+- Arithmetic overflow is exposed by the ALU but does not raise an exception.
+- Sub-word loads and stores and function-call instructions (`jal`/`jr`) are not
+  implemented yet.
 
 ## Roadmap
 
-A pipelined version of this processor (with hazard detection and
-forwarding) is in progress as a separate project: [link when ready]
+- Make data memory byte-addressed and add `lb`, `lbu`, `lh`, `lhu`, `sb`, and
+  `sh`.
+- Add `jal`, `jr`, and a program containing reusable subroutines.
+- Add linting and functional coverage alongside the directed testbenches.
+- Synthesize the core for an FPGA and publish resource utilization, maximum
+  clock frequency, and on-board results.
+- Build a separate five-stage pipelined RISC-V core with forwarding, stalls,
+  and hazard detection.
 
 ## License
 
