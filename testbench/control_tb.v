@@ -1,50 +1,21 @@
 `timescale 1ns/1ps
-
 module control_tb;
-
     reg [5:0] opcode;
-    wire reg_dst, alu_src, mem_to_reg, reg_write, mem_read, mem_write, branch, jump;
-    wire [1:0] alu_op;
-    integer errors = 0;
-
-    control dut(.opcode(opcode), .reg_dst(reg_dst), .alu_src(alu_src),
-                .mem_to_reg(mem_to_reg), .reg_write(reg_write),
-                .mem_read(mem_read), .mem_write(mem_write),
-                .branch(branch), .alu_op(alu_op), .jump(jump));
-
+    wire reg_dst,alu_src,mem_to_reg,reg_write,mem_read,mem_write,branch,jump;
+    wire branch_ne,imm_zero_extend,lui; wire [1:0] alu_op; integer errors=0;
+    control dut(.opcode(opcode),.reg_dst(reg_dst),.alu_src(alu_src),
+      .mem_to_reg(mem_to_reg),.reg_write(reg_write),.mem_read(mem_read),
+      .mem_write(mem_write),.branch(branch),.alu_op(alu_op),.jump(jump),
+      .branch_ne(branch_ne),.imm_zero_extend(imm_zero_extend),.lui(lui));
+    task expect; input rw,asrc,b,ne,zeroext,lui_exp; input [1:0] op; begin #1;
+      if({reg_write,alu_src,branch,branch_ne,imm_zero_extend,lui,alu_op} !==
+         {rw,asrc,b,ne,zeroext,lui_exp,op}) errors=errors+1;
+    end endtask
     initial begin
-        opcode = 6'b000000; #1; // r-type
-        if (reg_dst !== 1 || reg_write !== 1 || alu_op !== 2'b10 || mem_write !== 0 || branch !== 0)
-            begin $display("FAIL r_type"); errors = errors + 1; end
-        else $display("PASS r_type");
-
-        opcode = 6'b100011; #1; // lw
-        if (alu_src !== 1 || mem_to_reg !== 1 || reg_write !== 1 || mem_read !== 1)
-            begin $display("FAIL lw"); errors = errors + 1; end
-        else $display("PASS lw");
-
-        opcode = 6'b101011; #1; // sw
-        if (alu_src !== 1 || mem_write !== 1 || reg_write !== 0)
-            begin $display("FAIL sw"); errors = errors + 1; end
-        else $display("PASS sw");
-
-        opcode = 6'b000100; #1; // beq
-        if (branch !== 1 || alu_op !== 2'b01 || reg_write !== 0)
-            begin $display("FAIL beq"); errors = errors + 1; end
-        else $display("PASS beq");
-
-        opcode = 6'b000010; #1; // j
-        if (jump !== 1 || reg_write !== 0 || branch !== 0)
-            begin $display("FAIL jump"); errors = errors + 1; end
-        else $display("PASS jump");
-
-        opcode = 6'b111111; #1; // undefined opcode, all outputs must default to 0
-        if (reg_write !== 0 || mem_write !== 0 || branch !== 0 || jump !== 0)
-            begin $display("FAIL undefined_opcode"); errors = errors + 1; end
-        else $display("PASS undefined_opcode");
-
-        $display("errors: %0d", errors);
-        $finish;
+      opcode=6'h08; expect(1,1,0,0,0,0,2'b11);
+      opcode=6'h0c; expect(1,1,0,0,1,0,2'b11);
+      opcode=6'h05; expect(0,0,1,1,0,0,2'b01);
+      opcode=6'h0f; expect(1,1,0,0,1,1,2'b00);
+      $display("control_tb errors: %0d",errors); $finish;
     end
-
 endmodule
